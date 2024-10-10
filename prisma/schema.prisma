@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Guild {
+  id          String      @unique
+  name        String
+  description String?
+  challenges  Challenge[]
+}
+
+model Flag {
+  id          String     @id @unique @default(cuid())
+  hash        String     @unique
+  challenge   Challenge?
+  challengeId String?
+  winners     User[]
+}
+
+model User {
+  id                String      @id @default(cuid())
+  userid            String      @unique
+  username          String
+  flag              Flag[]
+  challengesCreated Challenge[]
+}
+
+model Challenge {
+  id          String  @id @unique @default(cuid())
+  name        String
+  description String?
+  guild       Guild   @relation(fields: [guildId], references: [id])
+  guildId     String
+  author      User    @relation(fields: [authorId], references: [id])
+  flag        Flag    @relation(fields: [flagId], references: [id])
+  flagId      String  @unique
+  difficulty  String
+  points      Int
+  authorId    String
+}
